@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SuperCoach Intelligence Dossier</title>
+<style>
+:root{
+  --bg:#04070d;
+  --panel:#0b1422;
+  --panel2:#101d30;
+  --panel3:#07101d;
+  --line:#233856;
+  --line2:#36577f;
+  --text:#f4f7fb;
+  --muted:#9db0c8;
+  --gold:#ffd166;
+  --gold2:#ffb703;
+  --blue:#4da3ff;
+  --green:#22d18b;
+  --red:#ff5c7a;
+  --orange:#ff9f43;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(77,163,255,.14), transparent 30%),
+    radial-gradient(circle at 80% 10%, rgba(255,209,102,.10), transparent 28%),
+    linear-gradient(180deg,#02050a,#07111f 45%,#02050a);
+  padding:18px;
+}
+body:before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;opacity:.12;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+  background-size:34px 34px;
+}
+.wrap{max-width:1320px;margin:0 auto;position:relative}
+.header{
+  border:1px solid var(--line);
+  background:linear-gradient(135deg,rgba(16,29,48,.96),rgba(5,11,20,.96));
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 18px 50px rgba(0,0,0,.35);
+  position:relative;
+  overflow:hidden;
+}
+.header:after{
+  content:"CLASSIFIED // SC INTEL";
+  position:absolute;right:-25px;top:28px;
+  transform:rotate(18deg);
+  border:2px solid rgba(255,209,102,.28);
+  color:rgba(255,209,102,.34);
+  font-weight:900;
+  letter-spacing:.12em;
+  padding:8px 20px;
+  border-radius:6px;
+}
+.kicker{color:var(--gold);font-weight:900;letter-spacing:.16em;font-size:12px;text-transform:uppercase}
+h1{margin:5px 0 4px;font-size:34px;letter-spacing:-.04em}
+.sub{color:var(--muted);line-height:1.45;max-width:900px}
+.missionBar{
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1fr 1fr auto;
+  gap:10px;
+  margin-top:16px;
+}
+label{display:block;color:#bcd4f5;font-size:12px;margin:0 0 5px;letter-spacing:.03em}
+input,select,textarea,button{
+  width:100%;
+  border-radius:13px;
+  border:1px solid var(--line);
+  background:#06101e;
+  color:var(--text);
+  padding:12px;
+  font-size:15px;
+  outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,209,102,.12)}
+button{
+  cursor:pointer;
+  font-weight:900;
+  background:linear-gradient(180deg,#ffd166,#b97900);
+  color:#111;
+  border:0;
+  letter-spacing:.02em;
+}
+button.secondary{background:#14243a;color:var(--text);border:1px solid var(--line)}
+button.danger{background:#4a1b28;color:#fff;border:1px solid #7e2b42}
+.mainGrid{
+  display:grid;
+  grid-template-columns:360px 1fr 360px;
+  gap:14px;
+  margin-top:14px;
+}
+.card{
+  background:linear-gradient(180deg,rgba(16,29,48,.94),rgba(6,14,27,.94));
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:16px;
+  box-shadow:0 16px 44px rgba(0,0,0,.30);
+}
+.cardTitle{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+  border-bottom:1px solid var(--line);
+  padding-bottom:10px;
+}
+.cardTitle h2{font-size:16px;margin:0;text-transform:uppercase;letter-spacing:.08em}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 9px;border-radius:99px;
+  background:#1b304b;border:1px solid var(--line2);
+  color:#dbeaff;font-size:12px;font-weight:800;
+}
+.profile{
+  display:grid;
+  grid-template-columns:104px 1fr;
+  gap:12px;
+  align-items:center;
+}
+.photoWrap{
+  width:104px;height:104px;border-radius:18px;
+  background:linear-gradient(145deg,#172a44,#050b14);
+  border:1px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+.photoWrap img{width:100%;height:100%;object-fit:cover;display:none}
+.initials{font-size:32px;font-weight:900;color:var(--gold)}
+.statusDot{width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 14px var(--green)}
+.playerName{font-size:25px;font-weight:900;line-height:1.05;margin-bottom:7px}
+.muted{color:var(--muted)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.tag{font-size:11px;font-weight:900;padding:5px 8px;border:1px solid var(--line2);border-radius:99px;background:#09182a;color:#d9e7ff}
+.tag.gold{border-color:rgba(255,209,102,.55);color:var(--gold)}
+.tag.green{border-color:rgba(34,209,139,.55);color:var(--green)}
+.tag.red{border-color:rgba(255,92,122,.55);color:var(--red)}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.miniMetric{background:#07101d;border:1px solid var(--line);border-radius:14px;padding:11px}
+.miniMetric .lab{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.miniMetric .val{font-size:21px;font-weight:900;margin-top:4px}
+.heroOutput{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+.bigStat{
+  background:linear-gradient(180deg,#12223a,#07101d);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:16px;
+  min-height:132px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.bigStat:before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue);
+}
+.bigStat.expected{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,209,102,.12),0 0 28px rgba(255,209,102,.13)}
+.bigStat.expected:before{background:var(--gold)}
+.bigStat.floor:before{background:var(--red)}
+.bigStat.ceiling:before{background:var(--green)}
+.bigStat.base:before{background:var(--blue)}
+.bigStat .lab{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}
+.bigStat .num{font-size:48px;font-weight:950;letter-spacing:-.05em}
+.expected .num{color:var(--gold)}
+.floor .num{color:var(--red)}
+.ceiling .num{color:var(--green)}
+.base .num{color:var(--blue)}
+.threatGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.panel{
+  background:#07101d;border:1px solid var(--line);
+  border-radius:16px;padding:13px;
+}
+.panel h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#dceaff}
+.report{
+  margin-top:14px;
+  background:linear-gradient(180deg,#07101d,#050b14);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:15px;
+}
+.report h3{margin:0 0 10px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;font-size:14px}
+.report ul{margin:0;padding-left:18px;color:#d2deee;line-height:1.55}
+.modRow{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(35,56,86,.7);padding:8px 0;font-size:14px}
+.modRow:last-child{border-bottom:0}
+.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--gold)}
+.advanced{
+  margin-top:14px;
+}
+details{
+  background:rgba(16,29,48,.82);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px;
+}
+summary{
+  cursor:pointer;
+  font-weight:900;
+  color:var(--gold);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.formGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.formGrid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.importBox{margin-top:14px}
+.small{font-size:12px;color:var(--muted);line-height:1.45}
+.tableWrap{overflow:auto;max-height:360px;margin-top:10px;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;white-space:nowrap}
+th{color:var(--muted);background:#081426;position:sticky;top:0}
+.playerSelectRow{display:grid;grid-template-columns:1fr 180px 210px;gap:10px;margin-top:12px}
+.weatherStamp{font-size:12px;color:var(--muted);line-height:1.45;margin-top:8px}
+.riskBar{height:10px;background:#081426;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.riskFill{height:100%;width:50%;background:linear-gradient(90deg,var(--green),var(--gold),var(--red))}
+@media(max-width:1100px){
+  .mainGrid{grid-template-columns:1fr}
+  .missionBar{grid-template-columns:1fr 1fr}
+}
+@media(max-width:720px){
+  body{padding:10px}
+  h1{font-size:25px}
+  .missionBar,.heroOutput,.threatGrid,.formGrid,.formGrid2,.metrics,.playerSelectRow{grid-template-columns:1fr}
+  .profile{grid-template-columns:88px 1fr}
+  .photoWrap{width:88px;height:88px}
+  .bigStat .num{font-size:42px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="header">
+    <div class="kicker">SuperCoach Tactical Intelligence Unit</div>
+    <h1>NRL SuperCoach Intelligence Dossier</h1>
+    <div class="sub">Select the player and match. The boring data lives underneath. The report gives you the only number that matters: <b style="color:var(--gold)">Expected</b>.</div>
+
+    <div class="missionBar">
+      <div>
+        <label>Target player</label>
+        <select id="playerSelect"></select>
+      </div>
+      <div>
+        <label>Opponent</label>
+        <input id="opposition" placeholder="e.g. Storm">
+      </div>
+      <div>
+        <label>Venue / city</label>
+        <input id="venueCity" placeholder="e.g. Brisbane">
+      </div>
+      <div>
+        <label>Date / time</label>
+        <div style="display:grid;grid-template-columns:1fr 92px;gap:8px">
+          <input id="gameDate" type="date">
+          <select id="gameHour"></select>
+        </div>
+      </div>
+      <div style="display:flex;align-items:end">
+        <button onclick="runMission()">Generate Report</button>
+      </div>
+    </div>
+
+    <div class="playerSelectRow">
+      <input id="searchBox" placeholder="Search player/team/position">
+      <button class="secondary" onclick="fetchLiveWeather()">Live Weather</button>
+      <button class="secondary" onclick="loadLatestSuperCoachData()">Update SC Data</button>
+    </div>
+  </section>
+
+  <section class="mainGrid">
+    <aside class="card">
+      <div class="cardTitle">
+        <h2>Target Profile</h2>
+        <span class="badge"><span class="statusDot"></span> Active</span>
+      </div>
+
+      <div class="profile">
+        <div class="photoWrap">
+          <img id="playerImg" alt="Player image">
+          <div id="initials" class="initials">PH</div>
+        </div>
+        <div>
+          <div class="playerName" id="profileName">Payne Haas</div>
+          <div class="muted"><span id="profileTeam">Broncos</span> // <span id="profilePos">FRF</span></div>
+          <div class="tags" id="profileTags"></div>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="miniMetric"><div class="lab">Price</div><div class="val" id="mPrice">-</div></div>
+        <div class="miniMetric"><div class="lab">BE</div><div class="val" id="mBE">-</div></div>
+        <div class="miniMetric"><div class="lab">Avg Pts</div><div class="val" id="mAvg">67</div></div>
+        <div class="miniMetric"><div class="lab">Avg Mins</div><div class="val" id="mMins">62</div></div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>Role Assessment</h3>
+        <div id="roleAssessment" class="muted">Stable starter profile. Projection uses recent form, minutes and role.</div>
+        <div class="riskBar"><div class="riskFill" id="riskFill"></div></div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>Data Feed</h3>
+        <div id="dataFeedStatus" class="small">Using local starter/test data until SuperCoach data is loaded.</div>
+      </div>
+    </aside>
+
+    <main class="card">
+      <div class="cardTitle">
+        <h2>Mission Output</h2>
+        <span class="badge">Expected = Magic Number</span>
+      </div>
+
+      <div class="heroOutput">
+        <div class="bigStat base"><div class="lab">Base</div><div class="num" id="baseOut">-</div></div>
+        <div class="bigStat floor"><div class="lab">Floor</div><div class="num" id="floorOut">-</div></div>
+        <div class="bigStat expected"><div class="lab">Expected</div><div class="num" id="expectedOut">-</div></div>
+        <div class="bigStat ceiling"><div class="lab">Ceiling</div><div class="num" id="ceilingOut">-</div></div>
+      </div>
+
+      <div class="threatGrid">
+        <div class="panel">
+          <h3>Score Engine</h3>
+          <div class="modRow"><span>Pre-match expected</span><b id="preMatchOut">-</b></div>
+          <div class="modRow"><span>Minutes factor</span><b id="minutesFactorOut">-</b></div>
+          <div class="modRow"><span>Role factor</span><b id="roleFactorOut">-</b></div>
+          <div class="modRow"><span>Goal-kick points</span><b id="goalPointsOut">-</b></div>
+        </div>
+        <div class="panel">
+          <h3>Match Modifiers</h3>
+          <div class="modRow"><span>Weather</span><b id="weatherFactorOut">-</b></div>
+          <div class="modRow"><span>Home/Away</span><b id="homeFactorOut">-</b></div>
+          <div class="modRow"><span>Opposition</span><b id="oppFactorOut">-</b></div>
+          <div class="modRow"><span>History</span><b id="historyFactorOut">-</b></div>
+          <div class="modRow"><span>Final capped modifier</span><b id="combinedFactorOut">-</b></div>
+        </div>
+      </div>
+
+      <div class="report">
+        <h3>Intel Summary</h3>
+        <ul id="intelSummary"></ul>
+      </div>
+    </main>
+
+    <aside class="card">
+      <div class="cardTitle">
+        <h2>Match Dossier</h2>
+        <span class="badge" id="weatherBadge">Weather: Manual</span>
+      </div>
+
+      <div class="panel">
+        <h3>Mission Conditions</h3>
+        <div class="modRow"><span>Opponent</span><b id="dOpponent">-</b></div>
+        <div class="modRow"><span>Venue</span><b id="dVenue">-</b></div>
+        <div class="modRow"><span>Weather class</span><b id="dWeather">Clear</b></div>
+        <div class="modRow"><span>Home status</span><b id="dHome">Neutral</b></div>
+        <div class="modRow"><span>Difficulty</span><b id="dDifficulty">Neutral</b></div>
+        <div class="weatherStamp" id="weatherStamp">No live weather loaded yet.</div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>Quick Verdict</h3>
+        <div id="quickVerdict" style="font-size:22px;font-weight:900;color:var(--gold)">HOLDING PATTERN</div>
+        <p class="small" id="quickVerdictText">Generate a report to classify this player.</p>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>Player Image Support</h3>
+        <p class="small">
+          Add images later using this folder format:<br>
+          <b>/images/players/player-name.png</b><br>
+          Example: <b>/images/players/payne-haas.png</b><br>
+          If no image exists, the app uses initials.
+        </p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="advanced">
+    <details>
+      <summary>Advanced Intel Controls / Import SuperCoach Data</summary>
+
+      <div class="formGrid">
+        <div><label>Player name</label><input id="playerName"></div>
+        <div><label>Team</label><input id="team"></div>
+        <div><label>SC Position</label><select id="position"><option>FRF</option><option>2RF</option><option>HOK</option><option>HFB</option><option>5/8</option><option>CTW</option><option>FLB</option></select></div>
+        <div><label>Role</label><select id="role"><option value="starter">Starter</option><option value="gun">Gun / elite</option><option value="eighty">80-minute role</option><option value="playmaker">Main playmaker</option><option value="bench">Bench forward</option><option value="utility">Utility bench</option><option value="rookie">Rookie</option><option value="restricted">Minutes restricted</option></select></div>
+        <div><label>Price</label><input id="price" type="number"></div>
+        <div><label>BE</label><input id="breakeven" type="number"></div>
+        <div><label>Avg Pts</label><input id="seasonAvg" type="number" step="0.1"></div>
+        <div><label>5Rd Avg</label><input id="last5Avg" type="number" step="0.1"></div>
+        <div><label>3Rd Avg</label><input id="last3Avg" type="number" step="0.1"></div>
+        <div><label>Avg Mins</label><input id="avgMinutes" type="number" step="1"></div>
+        <div><label>Expected Mins</label><input id="expectedMinutes" type="number" step="1"></div>
+        <div><label>Manual points</label><select id="manualBoost"><option value="0">None</option><option value="5">+5</option><option value="10">+10</option><option value="15">+15</option><option value="-5">-5</option><option value="-10">-10</option><option value="-15">-15</option></select></div>
+        <div><label>Goal kicker?</label><select id="goalKicker"><option value="no">No</option><option value="yes">Yes</option></select></div>
+        <div><label>Average goals</label><input id="avgGoals" type="number" step="0.1"></div>
+        <div><label>Home/Away</label><select id="gameLocation"><option value="neutral">Neutral</option><option value="home">Home</option><option value="away">Away</option><option value="travelHeavyAway">Travel-heavy away</option></select></div>
+        <div><label>Opposition difficulty</label><select id="oppositionDifficulty"><option value="neutral">Neutral</option><option value="veryEasy">Very easy</option><option value="easy">Easy</option><option value="hard">Hard</option><option value="veryHard">Very hard</option></select></div>
+        <div><label>Weather class</label><select id="weather"><option value="clear">Clear / dry</option><option value="lightRain">Light rain</option><option value="heavyRain">Heavy rain</option><option value="strongWind">Strong wind</option><option value="hotHumid">Hot / humid</option></select></div>
+        <div><label>Temp °C</label><input id="weatherTemp" type="number" step="0.1"></div>
+        <div><label>Rain mm/hr</label><input id="weatherRain" type="number" step="0.1"></div>
+        <div><label>Wind km/h</label><input id="weatherWind" type="number" step="0.1"></div>
+        <div><label>Humidity %</label><input id="weatherHumidity" type="number" step="1"></div>
+      </div>
+
+      <div class="formGrid2">
+        <div>
+          <label>Previous SC scores vs this opponent</label>
+          <input id="previousScores" placeholder="72, 69, 74">
+        </div>
+        <div>
+          <label>Custom player image URL</label>
+          <input id="imageUrl" placeholder="Optional image URL">
+        </div>
+      </div>
+
+      <div class="formGrid2">
+        <button class="secondary" onclick="savePlayer()">Save Player Changes</button>
+        <button class="secondary" onclick="addNewPlayer()">Add As New Player</button>
+      </div>
+
+      <div class="importBox">
+        <h3 style="margin-bottom:6px">Import all SuperCoach players</h3>
+        <p class="small">
+          Paste the copied SuperCoach player table including headers. Parser looks for Name, Posn, Team, Price, Avg Pts, BE, Avg Mins, 3Rd Avg, 5Rd Avg.
+        </p>
+        <div class="formGrid2">
+          <button class="secondary" onclick="window.open('https://www.nrlsupercoachstats.com/stats.php?year=2026','_blank')">Open SuperCoach Stats Table</button>
+          <button class="danger" onclick="resetPlayerData()">Reset Test List</button>
+        </div>
+        <textarea id="scPaste" rows="7" placeholder="Paste copied SuperCoach table here..."></textarea>
+        <div class="formGrid2">
+          <button onclick="importSuperCoachTable()">Import Pasted Table</button>
+          <button class="secondary" onclick="exportCsv()">Export Current CSV</button>
+        </div>
+        <p id="importStatus" class="small">No import yet.</p>
+      </div>
+
+      <div class="tableWrap">
+        <table>
+          <thead><tr><th>Player</th><th>Team</th><th>Pos</th><th>Price</th><th>Avg</th><th>3Rd</th><th>5Rd</th><th>BE</th><th>Expected</th></tr></thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+</div>
+
+<script>
+const STARTER_PLAYERS=[
+{name:"Payne Haas",team:"Broncos",position:"FRF",price:0,breakeven:0,seasonAvg:67,last5Avg:67,last3Avg:67,avgMinutes:62,expectedMinutes:62,role:"starter",goalKicker:false,avgGoals:0,imageUrl:""},
+{name:"Nathan Cleary",team:"Panthers",position:"HFB",price:0,breakeven:0,seasonAvg:78,last5Avg:78,last3Avg:78,avgMinutes:80,expectedMinutes:80,role:"gun",goalKicker:true,avgGoals:3.5,imageUrl:""},
+{name:"Nicho Hynes",team:"Sharks",position:"HFB",price:0,breakeven:0,seasonAvg:76,last5Avg:76,last3Avg:76,avgMinutes:80,expectedMinutes:80,role:"gun",goalKicker:true,avgGoals:3.5,imageUrl:""},
+{name:"Terrell May",team:"Wests Tigers",position:"FRF",price:0,breakeven:0,seasonAvg:63,last5Avg:70,last3Avg:72,avgMinutes:58,expectedMinutes:60,role:"gun",goalKicker:false,avgGoals:0,imageUrl:""},
+{name:"Scott Drinkwater",team:"Cowboys",position:"FLB",price:0,breakeven:0,seasonAvg:60,last5Avg:60,last3Avg:60,avgMinutes:80,expectedMinutes:80,role:"playmaker",goalKicker:false,avgGoals:0,imageUrl:""},
+{name:"Brian To'o",team:"Panthers",position:"CTW",price:0,breakeven:0,seasonAvg:59,last5Avg:59,last3Avg:59,avgMinutes:80,expectedMinutes:80,role:"starter",goalKicker:false,avgGoals:0,imageUrl:""}
+];
+
+let players=loadPlayers(), filteredIndexes=[];
+function loadPlayers(){try{const s=localStorage.getItem("scIntelDossierV4");if(s)return JSON.parse(s)}catch(e){}return structuredClone(STARTER_PLAYERS)}
+function persist(){localStorage.setItem("scIntelDossierV4",JSON.stringify(players))}
+function n(v,f=0){const x=Number(String(v??"").replace(/[$,%\s]/g,"").replace(/,/g,""));return Number.isFinite(x)?x:f}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function val(id){return document.getElementById(id).value}
+function set(id,v){const el=document.getElementById(id); if(el) el.value=v??""}
+function txt(id,v){const el=document.getElementById(id); if(el) el.textContent=v??""}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function money(x){return n(x)>0?"$"+Math.round(n(x)).toLocaleString():"-"}
+function getPositionKey(pos){const s=String(pos||"").toUpperCase();if(s.includes("5/8")||s.includes("5-8"))return"5/8";if(s.includes("HFB")||s==="HB")return"HFB";if(s.includes("FLB")||s==="FB")return"FLB";if(s.includes("HOK")||s==="HK")return"HOK";if(s.includes("2RF")||s.includes("SR")||s.includes("LK"))return"2RF";if(s.includes("FRF")||s.includes("PR"))return"FRF";if(s.includes("CTW")||s.includes("CE")||s.includes("WG"))return"CTW";return pos||"CTW"}
+function getRoleFactor(role){return({gun:1.04,starter:1,eighty:1.04,playmaker:1.03,bench:.85,utility:.80,rookie:.92,restricted:.82}[role]??1)}
+function getWeatherFactor(position,weather){const pos=getPositionKey(position);const t={clear:{FRF:1,"2RF":1,HOK:1,HFB:1,"5/8":1,CTW:1,FLB:1},lightRain:{FRF:1.01,"2RF":1.01,HOK:1,HFB:.98,"5/8":.98,CTW:.96,FLB:.97},heavyRain:{FRF:1.03,"2RF":1.02,HOK:1,HFB:.94,"5/8":.94,CTW:.90,FLB:.92},strongWind:{FRF:1,"2RF":1,HOK:1,HFB:.96,"5/8":.96,CTW:.94,FLB:.95},hotHumid:{FRF:.98,"2RF":.98,HOK:.98,HFB:.98,"5/8":.98,CTW:.98,FLB:.98}};return t[weather]?.[pos]??1}
+function getHomeAwayFactor(x){return({home:1.02,away:.98,neutral:1,travelHeavyAway:.97}[x]??1)}
+function getOppositionFactor(x){return({veryEasy:1.06,easy:1.04,neutral:1,hard:.96,veryHard:.93}[x]??1)}
+function getFloorFactor(p){return({FRF:.82,"2RF":.80,HOK:.80,HFB:.72,"5/8":.72,CTW:.58,FLB:.65}[getPositionKey(p)]??.70)}
+function getCeilingFactor(p){return({FRF:1.25,"2RF":1.30,HOK:1.30,HFB:1.45,"5/8":1.45,CTW:1.80,FLB:1.65}[getPositionKey(p)]??1.45)}
+function parseScores(t){return String(t||"").split(/[,\s]+/).map(Number).filter(x=>Number.isFinite(x)&&x>0)}
+function prevFactor(avg,t){const s=parseScores(t);if(!s.length||avg<=0)return{factor:1,count:s.length,avgVs:null,weight:0};const a=s.reduce((x,y)=>x+y,0)/s.length;let w=s.length===1?.10:s.length===2?.20:.30;return{factor:clamp(1+((a-avg)/avg)*w,.92,1.08),count:s.length,avgVs:a,weight:w}}
+function pct(f){const d=(f-1)*100;return(d>0?"+":"")+d.toFixed(1)+"%"}
+function factorClass(f){return f>1.005?"good":f<.995?"bad":"warn"}
+function getStableMinutes(p){
+  const role = p.role || "starter";
+  const avgM = n(p.avgMinutes, 0);
+  const expM = n(p.expectedMinutes, 0);
+
+  // Bye/DNP/tiny-minute protection:
+  // If imported data has 0–20 average minutes, do NOT let that wreck the projection
+  // unless the user deliberately marks the player as bench, utility, restricted, or rookie.
+  const lowMinuteRole = ["bench","utility","restricted","rookie"].includes(role);
+
+  let stableAvg = avgM;
+  if(!stableAvg || stableAvg < 20){
+    stableAvg = lowMinuteRole ? Math.max(1, avgM || expM || 25) : defaultMinutesForPosition(p.position);
+  }
+
+  let stableExpected = expM;
+  if(!stableExpected || stableExpected < 20){
+    stableExpected = lowMinuteRole ? Math.max(1, expM || avgM || 25) : stableAvg;
+  }
+
+  return {avg: stableAvg, expected: stableExpected, protected: (!lowMinuteRole && (avgM < 20 || expM < 20))};
+}
+function defaultMinutesForPosition(pos){
+  const p=getPositionKey(pos);
+  return ({FRF:55,"2RF":75,HOK:70,HFB:80,"5/8":80,CTW:80,FLB:80}[p] || 70);
+}
+function getUpsideFactor(p, base){
+  const season=n(p.seasonAvg), l5=n(p.last5Avg,season), l3=n(p.last3Avg,season);
+  if(!season || season < 25) return {factor:1, reason:"No reliable average for upside adjustment."};
+
+  const recent = (l5*.45 + l3*.55);
+  const recentLift = (recent - season) / season;
+
+  let factor = 1;
+  let reason = "Recent form is in line with season baseline.";
+
+  // Only reward form when recent data is clearly better. Keep it capped.
+  if(recentLift >= .18){
+    factor = 1.07;
+    reason = "Recent form is materially above season baseline.";
+  } else if(recentLift >= .10){
+    factor = 1.05;
+    reason = "Recent form is clearly above season baseline.";
+  } else if(recentLift >= .05){
+    factor = 1.03;
+    reason = "Recent form is slightly above season baseline.";
+  }
+
+  // For high-minute forwards/playmakers with strong recent form, let expected lean up,
+  // but never let this turn expected into ceiling.
+  if(["gun","eighty","playmaker"].includes(p.role) && factor > 1){
+    factor = Math.min(1.08, factor + .01);
+  }
+
+  return {factor, reason, recent: recent};
+}
+function calculateProjection(p){
+  const season=n(p.seasonAvg),l5=n(p.last5Avg,season)||season,l3=n(p.last3Avg,season)||season;
+
+  // Base stays stable; no price, no BE, no bye/minute zeros.
+  const base=season*.40+l5*.25+l3*.20+(season||l5||l3)*.15;
+
+  const mins = getStableMinutes(p);
+  const mf=clamp(mins.expected / Math.max(1, mins.avg), .92, 1.10);
+
+  const role=getRoleFactor(p.role);
+  const upside=getUpsideFactor(p, base);
+  const goals=p.goalKicker?n(p.avgGoals)*2:0, manual=n(p.manualBoost);
+
+  const pre=Math.max(0,base*mf*role*upside.factor+goals+manual);
+  const wf=getWeatherFactor(p.position,p.weather), hf=getHomeAwayFactor(p.gameLocation), of=getOppositionFactor(p.oppositionDifficulty), pf=prevFactor(pre,p.previousScores);
+  const raw=wf*hf*of*pf.factor, combined=clamp(raw,.88,1.12), exp=pre*combined;
+  return{base:Math.round(base),pre:Math.round(pre),floor:Math.round(exp*getFloorFactor(p.position)),expected:Math.round(exp),ceiling:Math.round(exp*getCeilingFactor(p.position)),raw:{mf,role,upside,goals,manual,pre,wf,hf,of,pf,raw,combined,mins}}
+}
+function current(){
+  return{name:val("playerName"),team:val("team"),position:val("position"),role:val("role"),price:n(val("price")),breakeven:n(val("breakeven")),seasonAvg:n(val("seasonAvg")),last5Avg:n(val("last5Avg")),last3Avg:n(val("last3Avg")),avgMinutes:n(val("avgMinutes"),80),expectedMinutes:n(val("expectedMinutes"),80),manualBoost:n(val("manualBoost")),goalKicker:val("goalKicker")==="yes",avgGoals:n(val("avgGoals")),weather:val("weather"),gameLocation:val("gameLocation"),oppositionDifficulty:val("oppositionDifficulty"),opposition:val("opposition"),previousScores:val("previousScores"),imageUrl:val("imageUrl")}
+}
+function setInputs(p){
+  set("playerName",p.name);set("team",p.team);set("position",getPositionKey(p.position));set("role",p.role||"starter");set("price",p.price);set("breakeven",p.breakeven);set("seasonAvg",p.seasonAvg);set("last5Avg",p.last5Avg);set("last3Avg",p.last3Avg);set("avgMinutes",p.avgMinutes||80);set("expectedMinutes",p.expectedMinutes||p.avgMinutes||80);set("manualBoost",p.manualBoost||0);set("goalKicker",p.goalKicker?"yes":"no");set("avgGoals",p.avgGoals||0);set("weather",p.weather||"clear");set("gameLocation",p.gameLocation||"neutral");set("oppositionDifficulty",p.oppositionDifficulty||"neutral");set("opposition",p.opposition||val("opposition"));set("previousScores",p.previousScores||"");set("imageUrl",p.imageUrl||"")
+}
+function slug(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+function initials(name){return String(name||"?").split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
+function updateImage(p){
+  const img=document.getElementById("playerImg"), ini=document.getElementById("initials");
+  const custom=p.imageUrl || "";
+  const local=`images/players/${slug(p.name)}.png`;
+  img.style.display="none";ini.style.display="block";ini.textContent=initials(p.name);
+  img.onerror=()=>{img.style.display="none";ini.style.display="block"};
+  img.onload=()=>{img.style.display="block";ini.style.display="none"};
+  img.src=custom || local;
+}
+function populateSelect(){
+  const q=(val("searchBox")||"").toLowerCase();filteredIndexes=[];const sel=document.getElementById("playerSelect");sel.innerHTML="";
+  players.forEach((p,i)=>{if(!q||String(p.name+" "+p.team+" "+p.position).toLowerCase().includes(q)){filteredIndexes.push(i);sel.innerHTML+=`<option value="${i}">${esc(p.name)} — ${esc(p.team||"")} — ${esc(getPositionKey(p.position))}</option>`}});
+}
+function onSelect(){const i=Number(val("playerSelect"));if(players[i]){setInputs(players[i]);renderReport()}}
+function renderTags(p,r){
+  const tags=[];
+  if(p.role==="gun")tags.push(["ELITE","gold"]);
+  if(p.goalKicker)tags.push(["GOAL KICKER","gold"]);
+  if(r.raw.upside && r.raw.upside.factor >= 1.05)tags.push(["UPSIDE LEAN","green"]);
+  if(r.raw.mins && r.raw.mins.protected)tags.push(["BYE/DNP PROTECTED","gold"]);
+  if(getPositionKey(p.position)==="CTW"||getPositionKey(p.position)==="FLB")tags.push(["VOLATILE",""]);
+  if(r.floor>=55)tags.push(["SAFE FLOOR",""]);
+  if(["bench","utility","restricted","rookie"].includes(p.role))tags.push(["MINUTES WATCH","red"]);
+  return tags.map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join("");
+}
+function roleText(p,r){
+  const pos=getPositionKey(p.position);
+  if(r.raw.mins && r.raw.mins.protected) return "Bye/DNP or tiny-minute data detected. Projection protected from fake minute damage.";
+  if(p.role==="restricted") return "Minutes restriction flagged. Treat projection carefully.";
+  if(p.role==="bench"||p.role==="utility") return "Bench/utility profile. Floor is dangerous unless minutes are confirmed.";
+  if(r.raw.upside && r.raw.upside.factor >= 1.05) return "Upside profile detected. Recent form is strong enough to lean expected upward without calling it ceiling.";
+  if(p.role==="gun") return "Elite profile. Projection leans on strong baseline plus role security.";
+  if(pos==="CTW") return "High volatility outside back. Ceiling is strong, floor can collapse.";
+  if(pos==="FRF"||pos==="2RF"||pos==="HOK") return "Forward profile. Usually more stable through base stats and minutes.";
+  return "Playmaker profile. Strong ceiling but conditions and opponent can matter.";
+}
+function verdict(p,r){
+  const exp=r.expected, floor=r.floor;
+  if(exp>=75) return ["CAPTAINCY RADAR","Elite output flagged. Still check matchup and minutes."];
+  if(exp>=65 && floor>=50) return ["STRONG PLAY","Good expected score with usable floor."];
+  if(exp>=55) return ["VIABLE","Playable, but not a slam dunk."];
+  if(exp>=45) return ["RISK ZONE","Only consider if price/value/fixture demands it."];
+  return ["AVOID / BENCH","Projection is not strong enough unless data is missing."];
+}
+function buildIntel(p,r){
+  const items=[];
+  items.push(`Baseline sits at ${r.base}, built from season average, 3-round form and 5-round form.`);
+  if(r.raw.mins && r.raw.mins.protected) items.push(`Bye/DNP/tiny-minute protection active. Stable minutes used: ${Math.round(r.raw.mins.expected)} expected, ${Math.round(r.raw.mins.avg)} baseline.`);
+  if(r.raw.upside && r.raw.upside.factor > 1) items.push(`Upside lean applied: ${r.raw.upside.reason} (${pct(r.raw.upside.factor)}).`);
+  else items.push("No upside boost applied; recent form does not justify it.");
+  items.push(`Pre-match expected is ${r.pre} before weather, home/away, opponent and history modifiers.`);
+  if(r.raw.wf>1)items.push(`Weather slightly helps this profile (${pct(r.raw.wf)}).`);
+  else if(r.raw.wf<1)items.push(`Weather is a drag on this profile (${pct(r.raw.wf)}).`);
+  else items.push("Weather is neutral.");
+  if(r.raw.hf>1)items.push("Home advantage gives a small bump.");
+  else if(r.raw.hf<1)items.push("Away/travel factor trims the projection slightly.");
+  if(r.raw.of>1)items.push("Opponent difficulty is favourable.");
+  else if(r.raw.of<1)items.push("Opponent difficulty is a negative.");
+  if(r.raw.pf.count)items.push(`Previous matchup sample: ${r.raw.pf.count} game(s), average ${r.raw.pf.avgVs.toFixed(1)}.`);
+  else items.push("No previous matchup scores entered, so history is ignored.");
+  items.push(`Final combined match modifier is capped at ${pct(r.raw.combined)} to prevent fake-confidence blowouts.`);
+  return items.map(x=>`<li>${esc(x)}</li>`).join("");
+}
+function renderReport(){
+  const p=current(), r=calculateProjection(p);
+  txt("baseOut",r.base);txt("floorOut",r.floor);txt("expectedOut",r.expected);txt("ceilingOut",r.ceiling);
+  txt("profileName",p.name||"Unnamed");txt("profileTeam",p.team||"-");txt("profilePos",getPositionKey(p.position));
+  txt("mPrice",money(p.price));txt("mBE",n(p.breakeven)>0?p.breakeven:"-");txt("mAvg",p.seasonAvg||"-");txt("mMins",p.avgMinutes||"-");
+  document.getElementById("profileTags").innerHTML=renderTags(p,r);
+  txt("roleAssessment",roleText(p,r));
+  updateImage(p);
+  txt("preMatchOut",r.pre);txt("minutesFactorOut",r.raw.mf.toFixed(2));txt("roleFactorOut",(r.raw.role*r.raw.upside.factor).toFixed(2));txt("goalPointsOut",r.raw.goals.toFixed(1));
+  setFactor("weatherFactorOut",r.raw.wf);setFactor("homeFactorOut",r.raw.hf);setFactor("oppFactorOut",r.raw.of);setFactor("historyFactorOut",r.raw.pf.factor);setFactor("combinedFactorOut",r.raw.combined);
+  txt("dOpponent",p.opposition||"-");txt("dVenue",val("venueCity")||"-");txt("dWeather",weatherLabel(p.weather));txt("dHome",homeLabel(p.gameLocation));txt("dDifficulty",difficultyLabel(p.oppositionDifficulty));
+  document.getElementById("intelSummary").innerHTML=buildIntel(p,r);
+  const v=verdict(p,r);txt("quickVerdict",v[0]);txt("quickVerdictText",v[1]);
+  const risk=Math.max(8,Math.min(92,100-(r.floor/Math.max(1,r.ceiling))*100));document.getElementById("riskFill").style.width=risk+"%";
+  renderPreview();
+}
+function setFactor(id,f){const el=document.getElementById(id);el.textContent=`${f.toFixed(2)} (${pct(f)})`;el.className=factorClass(f)}
+function weatherLabel(x){return({clear:"Clear",lightRain:"Light rain",heavyRain:"Heavy rain",strongWind:"Strong wind",hotHumid:"Hot / humid"}[x]||x)}
+function homeLabel(x){return({home:"Home",away:"Away",neutral:"Neutral",travelHeavyAway:"Travel-heavy away"}[x]||x)}
+function difficultyLabel(x){return({veryEasy:"Very easy",easy:"Easy",neutral:"Neutral",hard:"Hard",veryHard:"Very hard"}[x]||x)}
+async function runMission(){await fetchLiveWeather(false);renderReport()}
+async function fetchLiveWeather(showAlert=true){
+  try{
+    const city=val("venueCity").trim(); if(!city){ if(showAlert) alert("Enter venue/city first."); return; }
+    const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`).then(r=>r.json());
+    if(!geo.results?.length) throw new Error("City not found");
+    const g=geo.results[0];
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${g.latitude}&longitude=${g.longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&timezone=auto&forecast_days=10`;
+    const data=await fetch(url).then(r=>r.json());
+    const date=val("gameDate")||new Date().toISOString().slice(0,10), hour=String(val("gameHour")||"19").padStart(2,"0");
+    let idx=data.hourly.time.findIndex(t=>t.startsWith(`${date}T${hour}`)); if(idx<0)idx=0;
+    set("weatherTemp",data.hourly.temperature_2m[idx]);set("weatherRain",data.hourly.precipitation[idx]);set("weatherWind",data.hourly.wind_speed_10m[idx]);set("weatherHumidity",data.hourly.relative_humidity_2m[idx]);
+    classifyWeatherFromFields(false);
+    txt("weatherStamp",`Live weather loaded for ${g.name}, ${g.country_code||""} at ${data.hourly.time[idx]}. Temp ${val("weatherTemp")}°C, rain ${val("weatherRain")} mm/hr, wind ${val("weatherWind")} km/h.`);
+    txt("weatherBadge","Weather: Live");
+  }catch(e){txt("weatherStamp","Live weather failed: "+e.message); if(showAlert) alert("Weather failed: "+e.message)}
+}
+function classifyWeatherFromFields(render=true){
+  const rain=n(val("weatherRain")), wind=n(val("weatherWind")), temp=n(val("weatherTemp")), hum=n(val("weatherHumidity"));
+  let w="clear"; if(rain>=3)w="heavyRain"; else if(rain>0.2)w="lightRain"; else if(wind>=35)w="strongWind"; else if(temp>=28&&hum>=65)w="hotHumid";
+  set("weather",w); if(render)renderReport();
+}
+function savePlayer(){const i=Number(val("playerSelect"));if(players[i]){players[i]=current();persist();populateSelect();set("playerSelect",i);renderReport()}}
+function addNewPlayer(){const p=current();if(!p.name)return alert("Player name needed.");players.push(p);persist();populateSelect();set("playerSelect",players.length-1);renderReport()}
+function resetPlayerData(){if(confirm("Reset to test list? This removes imported players saved in this browser.")){players=structuredClone(STARTER_PLAYERS);persist();init()}}
+function renderPreview(){
+  document.getElementById("previewBody").innerHTML=players.slice(0,800).map(p=>{const r=calculateProjection({...p,weather:p.weather||"clear",gameLocation:p.gameLocation||"neutral",oppositionDifficulty:p.oppositionDifficulty||"neutral"});return`<tr><td>${esc(p.name)}</td><td>${esc(p.team)}</td><td>${esc(getPositionKey(p.position))}</td><td>${money(p.price)}</td><td>${p.seasonAvg??""}</td><td>${p.last3Avg??""}</td><td>${p.last5Avg??""}</td><td>${p.breakeven??""}</td><td><b>${r.expected}</b></td></tr>`}).join("");
+}
+function normalizeHeader(h){return String(h||"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+function splitLine(line){return line.includes("\t")?line.split("\t"):line.split(",")}
+function findCol(headers,names){const hs=headers.map(normalizeHeader);for(const name of names){const t=normalizeHeader(name);let i=hs.findIndex(h=>h===t);if(i>=0)return i}for(const name of names){const t=normalizeHeader(name);let i=hs.findIndex(h=>h.includes(t));if(i>=0)return i}return-1}
+function importSuperCoachTable(){
+  const paste=val("scPaste").trim(); if(!paste)return alert("Paste the SuperCoach table first.");
+  const lines=paste.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  let headerIndex=lines.findIndex(l=>/name/i.test(l)&&/(posn|position|team)/i.test(l)); if(headerIndex<0)headerIndex=0;
+  const headers=splitLine(lines[headerIndex]).map(x=>x.trim());
+  const c={name:findCol(headers,["Name"]),pos:findCol(headers,["Posn","Position","Pos"]),team:findCol(headers,["Team"]),price:findCol(headers,["Price"]),be:findCol(headers,["BE"]),avg:findCol(headers,["Avg Pts","AvgPts","Average"]),mins:findCol(headers,["Avg Mins","AvgMins"]),three:findCol(headers,["3Rd Avg","3RdAvg","3 Round Avg"]),five:findCol(headers,["5Rd Avg","5RdAvg","5 Round Avg"])};
+  if(c.name<0){txt("importStatus","Could not find Name column. Paste the table including headers.");return}
+  const imported=[];
+  for(const line of lines.slice(headerIndex+1)){
+    const cells=splitLine(line).map(x=>x.trim()); const name=cells[c.name]; if(!name||name.toLowerCase()==="name")continue;
+    const avg=n(cells[c.avg]);
+    imported.push({name,team:c.team>=0?cells[c.team]:"",position:getPositionKey(c.pos>=0?cells[c.pos]:"CTW"),price:c.price>=0?n(cells[c.price]):0,breakeven:c.be>=0?n(cells[c.be]):0,seasonAvg:avg,last5Avg:c.five>=0?n(cells[c.five],avg):avg,last3Avg:c.three>=0?n(cells[c.three],avg):avg,avgMinutes:c.mins>=0?n(cells[c.mins],80):80,expectedMinutes:c.mins>=0?n(cells[c.mins],80):80,role:"starter",goalKicker:false,avgGoals:0,manualBoost:0,weather:"clear",gameLocation:"neutral",oppositionDifficulty:"neutral",opposition:"",previousScores:"",imageUrl:""});
+  }
+  if(!imported.length){txt("importStatus","No players imported. Paste format was not readable.");return}
+  players=imported;persist();init();txt("importStatus",`Imported ${imported.length} SuperCoach players.`);
+}
+function exportCsv(){
+  set("scPaste",["Name,Team,Posn,Price,BE,Avg Pts,5Rd Avg,3Rd Avg,Avg Mins,Expected Mins",...players.map(p=>[p.name,p.team,p.position,p.price,p.breakeven,p.seasonAvg,p.last5Avg,p.last3Avg,p.avgMinutes,p.expectedMinutes].map(x=>String(x??"").replaceAll(","," ")).join(","))].join("\n"));
+}
+
+async function loadLatestSuperCoachData(){
+  try{
+    const res = await fetch(`data/players.json?ts=${Date.now()}`, {cache:"no-store"});
+    if(!res.ok) throw new Error("data/players.json not found yet. Run the GitHub updater workflow first.");
+    const data = await res.json();
+    if(!Array.isArray(data.players) || !data.players.length) throw new Error("players.json has no players.");
+    players = data.players.map(p=>({
+      name:p.name||"",
+      team:p.team||"",
+      position:p.position||p.posn||"CTW",
+      price:n(p.price),
+      breakeven:n(p.breakeven ?? p.be),
+      seasonAvg:n(p.seasonAvg ?? p.avgPts),
+      last5Avg:n(p.last5Avg ?? p.avg5 ?? p.fiveRdAvg ?? p.avgPts),
+      last3Avg:n(p.last3Avg ?? p.avg3 ?? p.threeRdAvg ?? p.avgPts),
+      avgMinutes:n(p.avgMinutes ?? p.avgMins, 80),
+      expectedMinutes:n(p.expectedMinutes ?? p.avgMinutes ?? p.avgMins, 80),
+      role:p.role||"starter",
+      goalKicker:!!p.goalKicker,
+      avgGoals:n(p.avgGoals),
+      manualBoost:0,
+      weather:"clear",
+      gameLocation:"neutral",
+      oppositionDifficulty:"neutral",
+      opposition:"",
+      previousScores:"",
+      imageUrl:p.imageUrl||""
+    })).filter(p=>p.name);
+    persist();
+    init();
+    const meta = data.meta || {};
+    txt("dataFeedStatus", `Loaded ${players.length} SuperCoach players from data feed. Updated: ${meta.updated_at || "unknown"}. Source: ${meta.source || "players.json"}.`);
+    txt("importStatus", `Loaded ${players.length} players from data/players.json.`);
+  }catch(e){
+    txt("dataFeedStatus", "Data update failed: " + e.message);
+    alert("SC data update failed: " + e.message);
+  }
+}
+
+function initHours(){
+  const sel=document.getElementById("gameHour");sel.innerHTML="";
+  for(let h=0;h<24;h++)sel.innerHTML+=`<option value="${h}">${String(h).padStart(2,"0")}:00</option>`;
+  sel.value="19";set("gameDate",new Date().toISOString().slice(0,10));
+}
+function init(){
+  populateSelect();
+  document.getElementById("playerSelect").onchange=onSelect;
+  document.getElementById("searchBox").oninput=()=>{populateSelect();if(filteredIndexes.length){set("playerSelect",filteredIndexes[0]);onSelect()}};
+  document.querySelectorAll("input,select,textarea").forEach(el=>{if(!["playerSelect","searchBox","scPaste"].includes(el.id))el.oninput=renderReport});
+  let i=players.findIndex(p=>p.name==="Payne Haas");set("playerSelect",i>=0?i:0);onSelect();
+}
+initHours();init();
+</script>
+</body>
+</html>
