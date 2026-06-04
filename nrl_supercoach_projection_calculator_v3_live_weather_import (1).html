@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NRL SuperCoach Projection Calculator V3</title>
+<style>
+:root{--bg:#07111f;--card:#101d30;--card2:#14243b;--text:#f5f7fb;--muted:#9fb0c7;--line:#263a58;--good:#23d18b;--warn:#ffd166;--bad:#ff5c7a;--blue:#4da3ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#050b14,#0b1424 35%,#07111f);color:var(--text);padding:14px}
+.wrap{max-width:1250px;margin:0 auto}
+h1{margin:0 0 6px;font-size:28px}.sub{color:var(--muted);margin-bottom:14px;line-height:1.45}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.card{background:rgba(16,29,48,.95);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:0 14px 36px rgba(0,0,0,.25)}
+h2{font-size:18px;margin:0 0 12px}.sectionTitle{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+label{display:block;font-size:13px;color:var(--muted);margin:11px 0 5px}
+input,select,textarea,button{width:100%;border-radius:12px;border:1px solid var(--line);background:#081426;color:var(--text);padding:11px;font-size:15px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:9px}
+.btns{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.btns button{flex:1;min-width:160px}
+button{cursor:pointer;background:linear-gradient(180deg,#2b7cff,#1258c9);border:0;font-weight:800}
+button.secondary{background:#1a2a43;border:1px solid var(--line)}button.danger{background:#4a1b28;border:1px solid #7e2b42}
+.results{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:13px;text-align:center}
+.stat .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}.stat .num{font-size:34px;font-weight:900;margin-top:6px}
+.magic{border-color:var(--warn);box-shadow:0 0 0 2px rgba(255,209,102,.16),0 0 22px rgba(255,209,102,.18)}.magic .num{color:var(--warn)}.floor .num{color:var(--bad)}.base .num{color:var(--blue)}.ceil .num{color:var(--good)}
+.breakdown,.note{margin-top:12px;background:#081426;border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--muted);line-height:1.55;font-size:14px}
+.note{background:#241b08;border-color:#6c5416;color:#ffe6a3}
+.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#203652;color:#d9e7ff;font-size:12px;margin:2px}
+.small{font-size:12px;color:var(--muted);line-height:1.45}.ok{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:8px;text-align:left;white-space:nowrap}th{color:var(--muted)}
+a{color:#9dccff}
+@media(max-width:900px){body{padding:10px}.grid{grid-template-columns:1fr}.results{grid-template-columns:1fr 1fr}.row,.row3,.row4{grid-template-columns:1fr}h1{font-size:22px}.stat .num{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>NRL SuperCoach Projection Calculator V3</h1>
+<div class="sub">Now with <b>live weather lookup</b> and <b>full SuperCoach table import</b>. Expected remains the magic number. Price/BE are displayed for trade value but do not predict score.</div>
+
+<div class="note">
+<b>Important:</b> this local file cannot safely scrape paid/protected data or bypass website restrictions. The clean method is: copy the SuperCoach player table, paste it below, and import. Live weather uses Open-Meteo directly from your browser.
+</div>
+
+<div class="grid">
+<div class="card">
+<h2>1) Player + SC Inputs</h2>
+<label>Player</label><select id="playerSelect"></select>
+<div class="row"><div><label>Search player</label><input id="searchBox" placeholder="Type player name/team"></div><div><label>Loaded players</label><input id="loadedCount" readonly></div></div>
+<div class="row"><div><label>Player name</label><input id="playerName"></div><div><label>Team</label><input id="team"></div></div>
+<div class="row4">
+<div><label>SC Position</label><select id="position"><option>FRF</option><option>2RF</option><option>HOK</option><option>HFB</option><option>5/8</option><option>CTW</option><option>FLB</option></select></div>
+<div><label>Role</label><select id="role"><option value="starter">Starter</option><option value="gun">Gun / elite</option><option value="eighty">80-minute role</option><option value="playmaker">Main playmaker</option><option value="bench">Bench forward</option><option value="utility">Utility bench</option><option value="rookie">Rookie / unknown</option><option value="restricted">Minutes restricted</option></select></div>
+<div><label>Price</label><input id="price" type="number" step="1000"></div>
+<div><label>BE</label><input id="breakeven" type="number" step="1"></div>
+</div>
+<div class="row3">
+<div><label>Avg Pts</label><input id="seasonAvg" type="number" step="0.1"></div>
+<div><label>5Rd Avg</label><input id="last5Avg" type="number" step="0.1"></div>
+<div><label>3Rd Avg</label><input id="last3Avg" type="number" step="0.1"></div>
+</div>
+<div class="row3">
+<div><label>Avg Mins</label><input id="avgMinutes" type="number" step="1"></div>
+<div><label>Expected Mins</label><input id="expectedMinutes" type="number" step="1"></div>
+<div><label>Manual points</label><select id="manualBoost"><option value="0">None</option><option value="5">+5</option><option value="10">+10</option><option value="15">+15</option><option value="-5">-5</option><option value="-10">-10</option><option value="-15">-15</option></select></div>
+</div>
+<div class="row"><div><label>Goal kicker?</label><select id="goalKicker"><option value="no">No</option><option value="yes">Yes</option></select></div><div><label>Average goals</label><input id="avgGoals" type="number" step="0.1" value="0"></div></div>
+
+<h2 class="sectionTitle">2) Match + Live Weather</h2>
+<div class="row3">
+<div><label>Venue / city</label><input id="venueCity" placeholder="e.g. Brisbane, Sydney, Melbourne"></div>
+<div><label>Game date</label><input id="gameDate" type="date"></div>
+<div><label>Game hour</label><select id="gameHour"></select></div>
+</div>
+<div class="btns"><button class="secondary" onclick="fetchLiveWeather()">Get live forecast</button><button class="secondary" onclick="classifyWeatherFromFields()">Classify weather from fields</button></div>
+<div class="row4">
+<div><label>Temp °C</label><input id="weatherTemp" type="number" step="0.1"></div>
+<div><label>Rain mm/hr</label><input id="weatherRain" type="number" step="0.1"></div>
+<div><label>Wind km/h</label><input id="weatherWind" type="number" step="0.1"></div>
+<div><label>Humidity %</label><input id="weatherHumidity" type="number" step="1"></div>
+</div>
+<div class="row">
+<div><label>Weather class</label><select id="weather"><option value="clear">Clear / dry</option><option value="lightRain">Light rain</option><option value="heavyRain">Heavy rain</option><option value="strongWind">Strong wind</option><option value="hotHumid">Hot / humid</option></select></div>
+<div><label>Home / away</label><select id="gameLocation"><option value="neutral">Neutral</option><option value="home">Home</option><option value="away">Away</option><option value="travelHeavyAway">Travel-heavy away</option></select></div>
+</div>
+<div class="row"><div><label>Opposition difficulty</label><select id="oppositionDifficulty"><option value="neutral">Neutral</option><option value="veryEasy">Very easy</option><option value="easy">Easy</option><option value="hard">Hard</option><option value="veryHard">Very hard</option></select></div><div><label>Opponent</label><input id="opposition" placeholder="e.g. Storm"></div></div>
+<label>Previous SC scores vs this opponent</label><input id="previousScores" placeholder="Example: 72, 69, 74">
+<div class="btns"><button onclick="calculateAndRender()">Calculate</button><button class="secondary" onclick="savePlayer()">Save player</button><button class="secondary" onclick="addNewPlayer()">Add new</button></div>
+</div>
+
+<div class="card">
+<h2>Projection Output</h2>
+<div class="results">
+<div class="stat base"><div class="label">Base</div><div class="num" id="baseOut">-</div></div>
+<div class="stat floor"><div class="label">Floor</div><div class="num" id="floorOut">-</div></div>
+<div class="stat magic"><div class="label">Expected</div><div class="num" id="expectedOut">-</div></div>
+<div class="stat ceil"><div class="label">Ceiling</div><div class="num" id="ceilingOut">-</div></div>
+</div>
+<div class="breakdown" id="breakdown">Choose a player and calculate.</div>
+<h2 class="sectionTitle">Modifier breakdown</h2>
+<div class="breakdown" id="modifierBreakdown">No calculation yet.</div>
+
+<h2 class="sectionTitle">3) Import all SuperCoach players</h2>
+<p class="small">
+Go to the 2026 NRL SuperCoach Stats player table, select/copy the table, paste it here, then click import.
+This parser accepts tab-separated copied tables or CSV. It looks for headers like Name, Posn, Team, Price, Avg Pts, BE, Avg Mins, 3Rd Avg and 5Rd Avg.
+</p>
+<div class="btns"><button class="secondary" onclick="window.open('https://www.nrlsupercoachstats.com/stats.php?year=2026','_blank')">Open SuperCoach Stats Table</button></div>
+<textarea id="scPaste" rows="8" placeholder="Paste copied SuperCoach player table here..."></textarea>
+<div class="btns"><button onclick="importSuperCoachTable()">Import pasted table</button><button class="secondary" onclick="exportCsv()">Export current CSV</button><button class="danger" onclick="resetPlayerData()">Reset test list</button></div>
+<div class="breakdown" id="importStatus">No import yet.</div>
+</div>
+</div>
+
+<div class="card" style="margin-top:14px">
+<h2>Player preview</h2>
+<div style="overflow:auto;max-height:380px"><table><thead><tr><th>Player</th><th>Team</th><th>Pos</th><th>Price</th><th>Avg</th><th>3Rd</th><th>5Rd</th><th>BE</th><th>Exp</th></tr></thead><tbody id="previewBody"></tbody></table></div>
+</div>
+</div>
+
+<script>
+const STARTER_PLAYERS=[
+{name:"Payne Haas",team:"Broncos",position:"FRF",price:0,breakeven:0,seasonAvg:67,last5Avg:67,last3Avg:67,avgMinutes:62,expectedMinutes:62,role:"starter",goalKicker:false,avgGoals:0},
+{name:"Nathan Cleary",team:"Panthers",position:"HFB",price:0,breakeven:0,seasonAvg:78,last5Avg:78,last3Avg:78,avgMinutes:80,expectedMinutes:80,role:"gun",goalKicker:true,avgGoals:3.5},
+{name:"Nicho Hynes",team:"Sharks",position:"HFB",price:0,breakeven:0,seasonAvg:76,last5Avg:76,last3Avg:76,avgMinutes:80,expectedMinutes:80,role:"gun",goalKicker:true,avgGoals:3.5},
+{name:"Terrell May",team:"Wests Tigers",position:"FRF",price:0,breakeven:0,seasonAvg:63,last5Avg:63,last3Avg:63,avgMinutes:58,expectedMinutes:58,role:"starter",goalKicker:false,avgGoals:0},
+{name:"Scott Drinkwater",team:"Cowboys",position:"FLB",price:0,breakeven:0,seasonAvg:60,last5Avg:60,last3Avg:60,avgMinutes:80,expectedMinutes:80,role:"playmaker",goalKicker:false,avgGoals:0},
+{name:"Brian To'o",team:"Panthers",position:"CTW",price:0,breakeven:0,seasonAvg:59,last5Avg:59,last3Avg:59,avgMinutes:80,expectedMinutes:80,role:"starter",goalKicker:false,avgGoals:0}
+];
+let players=loadPlayers(), filteredIndexes=[];
+function loadPlayers(){try{const s=localStorage.getItem("nrlSCProjectionV3");if(s)return JSON.parse(s)}catch(e){}return structuredClone(STARTER_PLAYERS)}
+function persist(){localStorage.setItem("nrlSCProjectionV3",JSON.stringify(players))}
+function n(v,f=0){const x=Number(String(v??"").replace(/[$,%\s]/g,"").replace(/,/g,""));return Number.isFinite(x)?x:f}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function getPositionKey(pos){const s=String(pos||"").toUpperCase();if(s.includes("5/8")||s.includes("5-8"))return"5/8";if(s.includes("HFB")||s==="HB")return"HFB";if(s.includes("FLB")||s==="FB")return"FLB";if(s.includes("HOK")||s==="HK")return"HOK";if(s.includes("2RF")||s.includes("SR")||s.includes("LK"))return"2RF";if(s.includes("FRF")||s.includes("PR"))return"FRF";if(s.includes("CTW")||s.includes("CE")||s.includes("WG"))return"CTW";return pos||"CTW"}
+function getRoleFactor(role){return({gun:1.04,starter:1,eighty:1.04,playmaker:1.03,bench:.85,utility:.80,rookie:.92,restricted:.82}[role]??1)}
+function getWeatherFactor(position,weather){const pos=getPositionKey(position);const t={clear:{FRF:1,"2RF":1,HOK:1,HFB:1,"5/8":1,CTW:1,FLB:1},lightRain:{FRF:1.01,"2RF":1.01,HOK:1,HFB:.98,"5/8":.98,CTW:.96,FLB:.97},heavyRain:{FRF:1.03,"2RF":1.02,HOK:1,HFB:.94,"5/8":.94,CTW:.90,FLB:.92},strongWind:{FRF:1,"2RF":1,HOK:1,HFB:.96,"5/8":.96,CTW:.94,FLB:.95},hotHumid:{FRF:.98,"2RF":.98,HOK:.98,HFB:.98,"5/8":.98,CTW:.98,FLB:.98}};return t[weather]?.[pos]??1}
+function getHomeAwayFactor(x){return({home:1.02,away:.98,neutral:1,travelHeavyAway:.97}[x]??1)}
+function getOppositionFactor(x){return({veryEasy:1.06,easy:1.04,neutral:1,hard:.96,veryHard:.93}[x]??1)}
+function getFloorFactor(p){return({FRF:.82,"2RF":.80,HOK:.80,HFB:.72,"5/8":.72,CTW:.58,FLB:.65}[getPositionKey(p)]??.70)}
+function getCeilingFactor(p){return({FRF:1.25,"2RF":1.30,HOK:1.30,HFB:1.45,"5/8":1.45,CTW:1.80,FLB:1.65}[getPositionKey(p)]??1.45)}
+function parseScores(t){return String(t||"").split(/[,\s]+/).map(Number).filter(x=>Number.isFinite(x)&&x>0)}
+function prevFactor(avg,t){const s=parseScores(t);if(!s.length||avg<=0)return{factor:1,count:s.length,avgVs:null,weight:0};const a=s.reduce((x,y)=>x+y,0)/s.length;let w=s.length===1?.10:s.length===2?.20:.30;return{factor:clamp(1+((a-avg)/avg)*w,.92,1.08),count:s.length,avgVs:a,weight:w}}
+function calculateProjection(p){const season=n(p.seasonAvg),l5=n(p.last5Avg,season)||season,l3=n(p.last3Avg,season)||season,base=season*.40+l5*.25+l3*.20+(season||l5||l3)*.15;let mf=clamp(Math.max(1,n(p.expectedMinutes,n(p.avgMinutes,80)))/Math.max(1,n(p.avgMinutes,80)),.85,1.15);const role=getRoleFactor(p.role),goals=p.goalKicker?n(p.avgGoals)*2:0,manual=n(p.manualBoost);const pre=Math.max(0,base*mf*role+goals+manual);const wf=getWeatherFactor(p.position,p.weather),hf=getHomeAwayFactor(p.gameLocation),of=getOppositionFactor(p.oppositionDifficulty),pf=prevFactor(pre,p.previousScores);const raw=wf*hf*of*pf.factor,combined=clamp(raw,.88,1.12);const exp=pre*combined;return{base:Math.round(base),pre:Math.round(pre),floor:Math.round(exp*getFloorFactor(p.position)),expected:Math.round(exp),ceiling:Math.round(exp*getCeilingFactor(p.position)),raw:{mf,role,goals,manual,pre,wf,hf,of,pf,raw,combined}}}
+function pct(f){const d=(f-1)*100;return(d>0?"+":"")+d.toFixed(1)+"%"} function cls(f){return f>1.005?"ok":f<.995?"bad":"warn"}
+function current(){return{name:val("playerName"),team:val("team"),position:val("position"),role:val("role"),price:n(val("price")),breakeven:n(val("breakeven")),seasonAvg:n(val("seasonAvg")),last5Avg:n(val("last5Avg")),last3Avg:n(val("last3Avg")),avgMinutes:n(val("avgMinutes"),80),expectedMinutes:n(val("expectedMinutes"),80),manualBoost:n(val("manualBoost")),goalKicker:val("goalKicker")==="yes",avgGoals:n(val("avgGoals")),weather:val("weather"),gameLocation:val("gameLocation"),oppositionDifficulty:val("oppositionDifficulty"),opposition:val("opposition"),previousScores:val("previousScores")}}
+function val(id){return document.getElementById(id).value} function set(id,v){document.getElementById(id).value=v??""}
+function setInputs(p){set("playerName",p.name);set("team",p.team);set("position",getPositionKey(p.position));set("role",p.role||"starter");set("price",p.price);set("breakeven",p.breakeven);set("seasonAvg",p.seasonAvg);set("last5Avg",p.last5Avg);set("last3Avg",p.last3Avg);set("avgMinutes",p.avgMinutes||80);set("expectedMinutes",p.expectedMinutes||p.avgMinutes||80);set("manualBoost",p.manualBoost||0);set("goalKicker",p.goalKicker?"yes":"no");set("avgGoals",p.avgGoals||0);set("weather",p.weather||"clear");set("gameLocation",p.gameLocation||"neutral");set("oppositionDifficulty",p.oppositionDifficulty||"neutral");set("opposition",p.opposition||"");set("previousScores",p.previousScores||"")}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function populateSelect(){const q=val("searchBox")?.toLowerCase()||"";filteredIndexes=[];const sel=document.getElementById("playerSelect");sel.innerHTML="";players.forEach((p,i)=>{if(!q||String(p.name+" "+p.team+" "+p.position).toLowerCase().includes(q)){filteredIndexes.push(i);sel.innerHTML+=`<option value="${i}">${esc(p.name)} — ${esc(p.team||"")} — ${esc(getPositionKey(p.position))}</option>`}});set("loadedCount",players.length+" total / "+filteredIndexes.length+" shown")}
+function onSelect(){const i=Number(val("playerSelect"));if(players[i]){setInputs(players[i]);calculateAndRender()}}
+function calculateAndRender(){const p=current(),r=calculateProjection(p);set("baseOut",r.base);set("floorOut",r.floor);set("expectedOut",r.expected);set("ceilingOut",r.ceiling);document.getElementById("breakdown").innerHTML=`<b>${esc(p.name||"Unnamed")}</b> <span class="pill">${esc(p.team)}</span> <span class="pill">${esc(p.position)}</span><br>Price: <b>${p.price?("$"+Math.round(p.price).toLocaleString()):"not entered"}</b> — not used in score<br>BE: <b>${p.breakeven||"not entered"}</b> — not used in score<br><br>Base: <b>${r.base}</b><br>Minutes factor: <b>${r.raw.mf.toFixed(2)}</b><br>Role factor: <b>${r.raw.role.toFixed(2)}</b><br>Goal kicking points: <b>${r.raw.goals.toFixed(1)}</b><br>Pre-match expected: <b>${r.pre}</b><br>Final expected magic number: <b style="color:var(--warn);font-size:18px">${r.expected}</b>`;const prev=r.raw.pf.count?`${r.raw.pf.count} scores, avg ${r.raw.pf.avgVs.toFixed(1)}, weight ${(r.raw.pf.weight*100).toFixed(0)}%`:"none";document.getElementById("modifierBreakdown").innerHTML=`Weather: <b class="${cls(r.raw.wf)}">${r.raw.wf.toFixed(2)} (${pct(r.raw.wf)})</b><br>Home/Away: <b class="${cls(r.raw.hf)}">${r.raw.hf.toFixed(2)} (${pct(r.raw.hf)})</b><br>Opposition: <b class="${cls(r.raw.of)}">${r.raw.of.toFixed(2)} (${pct(r.raw.of)})</b><br>Previous matchup: <b class="${cls(r.raw.pf.factor)}">${r.raw.pf.factor.toFixed(2)} (${pct(r.raw.pf.factor)})</b> — ${esc(prev)}<br><br>Raw combined: <b>${r.raw.raw.toFixed(3)} (${pct(r.raw.raw)})</b><br>Capped combined: <b class="${cls(r.raw.combined)}">${r.raw.combined.toFixed(3)} (${pct(r.raw.combined)})</b>`;renderPreview()}
+function savePlayer(){const i=Number(val("playerSelect"));if(players[i]){players[i]=current();persist();populateSelect();set("playerSelect",i);calculateAndRender()}}
+function addNewPlayer(){const p=current();if(!p.name)return alert("Player name needed.");players.push(p);persist();populateSelect();set("playerSelect",players.length-1);calculateAndRender()}
+function resetPlayerData(){if(confirm("Reset to test list?")){players=structuredClone(STARTER_PLAYERS);persist();init()}}
+function renderPreview(){document.getElementById("previewBody").innerHTML=players.slice(0,700).map(p=>{const r=calculateProjection({...p,weather:p.weather||"clear",gameLocation:p.gameLocation||"neutral",oppositionDifficulty:p.oppositionDifficulty||"neutral"});return`<tr><td>${esc(p.name)}</td><td>${esc(p.team)}</td><td>${esc(getPositionKey(p.position))}</td><td>${p.price?("$"+Math.round(p.price).toLocaleString()):""}</td><td>${p.seasonAvg??""}</td><td>${p.last3Avg??""}</td><td>${p.last5Avg??""}</td><td>${p.breakeven??""}</td><td><b>${r.expected}</b></td></tr>`}).join("")}
+function normalizeHeader(h){return String(h||"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+function splitLine(line){return line.includes("\t")?line.split("\t"):line.split(",")}
+function findCol(headers,names){const hs=headers.map(normalizeHeader);for(const name of names){const target=normalizeHeader(name);const i=hs.findIndex(h=>h===target);if(i>=0)return i}for(const name of names){const target=normalizeHeader(name);const i=hs.findIndex(h=>h.includes(target));if(i>=0)return i}return-1}
+function importSuperCoachTable(){const txt=val("scPaste").trim();if(!txt)return alert("Paste table first.");const lines=txt.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);let headerIndex=lines.findIndex(l=>/name/i.test(l)&&/(posn|position|team)/i.test(l));if(headerIndex<0)headerIndex=0;const headers=splitLine(lines[headerIndex]).map(x=>x.trim());const c={name:findCol(headers,["Name"]),pos:findCol(headers,["Posn","Position","Pos"]),team:findCol(headers,["Team"]),price:findCol(headers,["Price"]),be:findCol(headers,["BE"]),avg:findCol(headers,["Avg Pts","AvgPts","Average"]),mins:findCol(headers,["Avg Mins","AvgMins"]),three:findCol(headers,["3Rd Avg","3RdAvg","3 Round Avg"]),five:findCol(headers,["5Rd Avg","5RdAvg","5 Round Avg"])};if(c.name<0){document.getElementById("importStatus").innerHTML='<span class="bad">Could not find Name column. Paste the table including headers.</span>';return}const imported=[];for(const line of lines.slice(headerIndex+1)){const cells=splitLine(line).map(x=>x.trim());const name=cells[c.name];if(!name||name.toLowerCase()==="name")continue;const avg=n(cells[c.avg]);imported.push({name,team:c.team>=0?cells[c.team]:"",position:getPositionKey(c.pos>=0?cells[c.pos]:"CTW"),price:c.price>=0?n(cells[c.price]):0,breakeven:c.be>=0?n(cells[c.be]):0,seasonAvg:avg,last5Avg:c.five>=0?n(cells[c.five],avg):avg,last3Avg:c.three>=0?n(cells[c.three],avg):avg,avgMinutes:c.mins>=0?n(cells[c.mins],80):80,expectedMinutes:c.mins>=0?n(cells[c.mins],80):80,role:"starter",goalKicker:false,avgGoals:0,manualBoost:0,weather:"clear",gameLocation:"neutral",oppositionDifficulty:"neutral",opposition:"",previousScores:""})}if(!imported.length){document.getElementById("importStatus").innerHTML='<span class="bad">No players imported. The paste format is not readable.</span>';return}players=imported;persist();init();document.getElementById("importStatus").innerHTML=`<span class="ok">Imported ${imported.length} SuperCoach players.</span>`}
+function exportCsv(){document.getElementById("scPaste").value=["Name,Team,Posn,Price,BE,Avg Pts,5Rd Avg,3Rd Avg,Avg Mins,Expected Mins",...players.map(p=>[p.name,p.team,p.position,p.price,p.breakeven,p.seasonAvg,p.last5Avg,p.last3Avg,p.avgMinutes,p.expectedMinutes].map(x=>String(x??"").replaceAll(","," ")).join(","))].join("\n")}
+async function fetchLiveWeather(){try{const city=val("venueCity").trim();if(!city)return alert("Enter venue/city first.");const geo=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`).then(r=>r.json());if(!geo.results?.length)throw new Error("City not found");const g=geo.results[0];const url=`https://api.open-meteo.com/v1/forecast?latitude=${g.latitude}&longitude=${g.longitude}&hourly=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m&timezone=auto&forecast_days=10`;const data=await fetch(url).then(r=>r.json());const date=val("gameDate")||new Date().toISOString().slice(0,10);const hour=String(val("gameHour")||"19").padStart(2,"0");let idx=data.hourly.time.findIndex(t=>t.startsWith(`${date}T${hour}`));if(idx<0)idx=0;set("weatherTemp",data.hourly.temperature_2m[idx]);set("weatherRain",data.hourly.precipitation[idx]);set("weatherWind",data.hourly.wind_speed_10m[idx]);set("weatherHumidity",data.hourly.relative_humidity_2m[idx]);classifyWeatherFromFields();document.getElementById("modifierBreakdown").innerHTML=`Live weather loaded for <b>${esc(g.name)}, ${esc(g.country_code||"")}</b> at ${esc(data.hourly.time[idx])}. Now calculate projection.`;calculateAndRender()}catch(e){alert("Weather failed: "+e.message)}}
+function classifyWeatherFromFields(){const rain=n(val("weatherRain")),wind=n(val("weatherWind")),temp=n(val("weatherTemp")),hum=n(val("weatherHumidity"));let w="clear";if(rain>=3)w="heavyRain";else if(rain>0.2)w="lightRain";else if(wind>=35)w="strongWind";else if(temp>=28&&hum>=65)w="hotHumid";set("weather",w);calculateAndRender()}
+function initHours(){const sel=document.getElementById("gameHour");sel.innerHTML="";for(let h=0;h<24;h++){sel.innerHTML+=`<option value="${h}">${String(h).padStart(2,"0")}:00</option>`}sel.value="19";set("gameDate",new Date().toISOString().slice(0,10))}
+function init(){populateSelect();document.getElementById("playerSelect").onchange=onSelect;document.getElementById("searchBox").oninput=()=>{populateSelect();if(filteredIndexes.length){set("playerSelect",filteredIndexes[0]);onSelect()}};document.querySelectorAll("input,select,textarea").forEach(el=>{if(!["playerSelect","searchBox","scPaste"].includes(el.id))el.oninput=calculateAndRender});let i=players.findIndex(p=>p.name==="Payne Haas");set("playerSelect",i>=0?i:0);onSelect();renderPreview()}
+initHours();init();
+</script>
+</body>
+</html>
